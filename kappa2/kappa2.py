@@ -53,6 +53,9 @@ def get_moment(fileS1):
         mu=np.sqrt(float(dip_sqrd[-1])) 
     return dip_vec
 
+#mu = get_moment('3bS1.log')
+#print(mu)
+
 def gera_base(vetores,atomos):
     a = vetores[atomos[1]-1,:] - vetores[atomos[0]-1,:]
     b = vetores[atomos[2]-1,:] - vetores[atomos[0]-1,:]
@@ -65,7 +68,7 @@ def gera_base(vetores,atomos):
     return matriz
 
 # PEGA OS ATOMOS E VETORES DOS DÍMEROS
-def coords_dim(fileDim):
+def coords(fileDim):
     vetores = np.array([0,0,0])
     atomos  = np.array([0])
     with open(fileDim, 'r') as f:
@@ -84,7 +87,7 @@ def coords_dim(fileDim):
 
 # CALCULA O VETOR TRANSLAÇÃO E A DISTÂNCIA DE CENTRO DE MASSAS ENTRE OS DÍMEROS
 def trans_dim(fileDim): 
-    atomos, vetores = coords_dim(fileDim)
+    atomos, vetores = coords(fileDim)
     n_atoms = np.shape(atomos)[0]
     mol1    = vetores[:int(n_atoms/2),:]
     mol2    = vetores[int((n_atoms/2)):,:]
@@ -142,7 +145,7 @@ def kappa2(fileS1,fileDim,atomos_opt,atomos_dim1,atomos_dim2):
     dip_vec = get_moment(fileS1)
     #print(np.sqrt(np.inner(dip_vec,dip_vec)))
     nmu     = np.matmul(dip_vec,inversa)
-    _ , vetores = coords_dim(fileDim)
+    _ , vetores = coords(fileDim)
     matriz_dim1 = gera_base(vetores,atomos_dim1)
     mu_final1   = np.matmul(nmu,matriz_dim1)
     #print(np.sqrt(np.inner(mu_final1,mu_final1)))
@@ -158,6 +161,6 @@ def kappa2(fileS1,fileDim,atomos_opt,atomos_dim1,atomos_dim2):
     return kappa2
 
 #kappa2 = kappa2('3bS1.log','Dimero3b1.xyz',[9,18,16],[32,15,1],[92,75,61])
-kappa2 = kappa2('3bS1.log','Dimero3b2.xyz',[9,18,16],[32,15,1],[92,75,61])
+#kappa2 = kappa2('3bS1.log','Dimero3b2.xyz',[9,18,16],[32,15,1],[92,75,61])
 #kappa2 = kappa2('3bS1.log','Dimero3b3.xyz',[9,18,16],[2,45,31],[62,105,91])
-print(kappa2)
+#print(kappa2)
