@@ -51,10 +51,7 @@ def get_moment(fileS1):
             elif n >= 3:
                 n = -1
         mu=np.sqrt(float(dip_sqrd[-1])) 
-    return dip_vec
-
-#mu = get_moment('3bS1.log')
-#print(mu)
+    return mu, dip_vec
 
 def gera_base(vetores,atomos):
     a = vetores[atomos[1]-1,:] - vetores[atomos[0]-1,:]
@@ -101,66 +98,51 @@ def trans_dim(fileDim):
     dcm = np.sqrt(np.inner(trans,trans))*0.1 #nm
     return trans, dcm
 
-def pega_geom(fileS1):
-    if ".log" in fileS1:
-        busca = "orientation:"
-        n = -1
-        with open(fileS1, 'r') as f:
-            for line in f:
-                if busca in line and 'Dipole' not in line:
-                    n = 0
-                    vetores = np.zeros((1,3))
-                    atomos = []
-                elif n >= 0 and n < 4:
-                    n += 1
-                elif n >= 4 and "---------------------------------------------------------------------" not in line:    
-                    line = line.split()
-                    NG = []
-                    for j in range(3,len(line)):
-                        NG.append(float(line[j]))
-                    atomos.append(line[1])
-                    vetores = np.vstack((vetores,NG))       
-                    n += 1  
-                elif "---------------------------------------------------------------------" in line and n>1:
-                    n = -1       
-    else:
-        vetores = np.zeros((1,3))
-        atomos = []
-        with open(fileS1, 'r') as f:
-            for line in f:
-                line = line.split()
-                try:
-                    vetor = np.array([float(line[1]),float(line[2]), float(line[3])])
-                    atomos.append(line[0])
-                    vetores = np.vstack((vetores,vetor))
-                except:
-                    pass
-    vetores = vetores[1:,:]                 
-    return vetores
+def pega_geom(file):
+    vetores = np.array([0,0,0])
+    atomos  = np.array([0])
+    arquivo = open(file, 'r')
+    lista = arquivo.readlines()
+    i=1
+    for linha in lista:
+        i += 1
+        if 'Standard orientation:' in linha:
+            j=i+3
+        if "NAtoms=" in linha:
+            aux=linha.split()
+            num_a=int(aux[1])
+    
+    geom=lista[j:j+num_a]
+    for linha in geom:
+        aux=linha.split()
+        vetor   = np.array([float(aux[3]),float(aux[4]),float(aux[5])])
+        vetores = np.vstack((vetores,vetor))
+        atomo   = np.array([aux[1]])
+        atomos  = np.vstack((atomos,atomo))
+    atomos  = np.delete(atomos,0,0)
+    vetores = np.delete(vetores,0,0)    
+    return atomos, vetores
 
 def kappa2(fileS1,fileDim,atomos_opt,atomos_dim1,atomos_dim2):
-    vetores = pega_geom(fileS1)
+    _, vetores = pega_geom(fileS1)
     matriz  = gera_base(vetores,atomos_opt)
     inversa = np.linalg.inv(matriz)
-    dip_vec = get_moment(fileS1)
-    #print(np.sqrt(np.inner(dip_vec,dip_vec)))
+    _, dip_vec = get_moment(fileS1)
     nmu     = np.matmul(dip_vec,inversa)
     _ , vetores = coords(fileDim)
     matriz_dim1 = gera_base(vetores,atomos_dim1)
     mu_final1   = np.matmul(nmu,matriz_dim1)
-    #print(np.sqrt(np.inner(mu_final1,mu_final1)))
     matriz_dim2 = gera_base(vetores,atomos_dim2)
     mu_final2   = np.matmul(nmu,matriz_dim2)
     mu_d = mu_final1/np.sqrt(np.inner(mu_final1,mu_final1))
     mu_a = mu_final2/np.sqrt(np.inner(mu_final2,mu_final2))
-    trans, dcm  = trans_dim(fileDim)
-    #print(dcm)
+    trans, _  = trans_dim(fileDim)
     r = trans/np.sqrt(np.inner(trans,trans))
     kappa  = np.inner(mu_d,mu_a) - 3*np.inner(r,mu_d)*np.inner(r,mu_a)
     kappa2 = kappa**2
     return kappa2
 
 #kappa2 = kappa2('3bS1.log','Dimero3b1.xyz',[9,18,16],[32,15,1],[92,75,61])
-#kappa2 = kappa2('3bS1.log','Dimero3b2.xyz',[9,18,16],[32,15,1],[92,75,61])
+kappa2 = kappa2('3bS1.log','Dimero3b2.xyz',[9,18,16],[32,15,1],[92,75,61])
 #kappa2 = kappa2('3bS1.log','Dimero3b3.xyz',[9,18,16],[2,45,31],[62,105,91])
-#print(kappa2)
+print(kappa2)
