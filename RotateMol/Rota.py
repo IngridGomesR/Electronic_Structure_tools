@@ -1,5 +1,29 @@
 import numpy as np
-from kappa2 import coords
+
+def pega_geom(file):
+    vetores = np.array([0,0,0])
+    atomos  = np.array([0])
+    arquivo = open(file, 'r')
+    lista = arquivo.readlines()
+    i=1
+    for linha in lista:
+        i += 1
+        if 'Standard orientation:' in linha:
+            j=i+3
+        if "NAtoms=" in linha:
+            aux=linha.split()
+            num_a=int(aux[1])
+    
+    geom=lista[j:j+num_a]
+    for linha in geom:
+        aux=linha.split()
+        vetor   = np.array([float(aux[3]),float(aux[4]),float(aux[5])])
+        vetores = np.vstack((vetores,vetor))
+        atomo   = np.array([aux[1]])
+        atomos  = np.vstack((atomos,atomo))
+    atomos  = np.delete(atomos,0,0)
+    vetores = np.delete(vetores,0,0)    
+    return atomos, vetores
 
 def gerafile(namefile, atomos, vetores):
     with open(namefile,'w') as f:
@@ -9,7 +33,7 @@ def gerafile(namefile, atomos, vetores):
     return 
     
 def Rota(namefile, thetax, thetay, thetaz, newfile):
-    atomos, vetores = coords(namefile)
+    atomos, vetores = pega_geom(namefile) #coords(namefile)
     Rx = np.array([[1,0,0],[0,np.cos(thetax),-np.sin(thetax)],[0, np.sin(thetax), np.cos(thetax)]])
     Ry = np.array([[np.cos(thetay),0,np.sin(thetay)],[0,1,0],[-np.sin(thetay), 0, np.cos(thetay)]])
     Rz = np.array([[np.cos(thetaz), -np.sin(thetaz),0],[np.sin(thetaz), np.cos(thetaz),0],[0,0,1]])
@@ -23,8 +47,8 @@ def Rota(namefile, thetax, thetay, thetaz, newfile):
     gerafile(newfile, atomos, rota) 
     return rota
 
-#rota = Rota('BenzenoTrans.xyz', np.pi/2, 0, np.pi/4, 'BenzenoRota.xyz')
-#print(rota)
+rota = Rota('3bS1.log', np.pi/2, 0, 0, '3bRota90.xyz')
+
 
 
 
