@@ -1,5 +1,22 @@
 import numpy as np
 
+def coords(fileDim):
+    vetores = np.array([0,0,0])
+    atomos  = np.array([0])
+    with open(fileDim, 'r') as f:
+        for line in f:
+            line = line.split()
+            if len(line) < 4:
+                pass
+            else:
+                vetor   = np.array([float(line[1]),float(line[2]),float(line[3])])
+                vetores = np.vstack((vetores,vetor))
+                atomo   = np.array([line[0]])
+                atomos  = np.vstack((atomos,atomo))
+    atomos  = np.delete(atomos,0,0)
+    vetores = np.delete(vetores,0,0)
+    return atomos, vetores
+
 def pega_geom(file):
     vetores = np.array([0,0,0])
     atomos  = np.array([0])
@@ -33,7 +50,7 @@ def gerafile(namefile, atomos, vetores):
     return 
     
 def Rota(namefile, thetax, thetay, thetaz, newfile):
-    atomos, vetores = pega_geom(namefile) #coords(namefile)
+    atomos, vetores = coords(namefile) #pega_geom(namefile) #
     Rx = np.array([[1,0,0],[0,np.cos(thetax),-np.sin(thetax)],[0, np.sin(thetax), np.cos(thetax)]])
     Ry = np.array([[np.cos(thetay),0,np.sin(thetay)],[0,1,0],[-np.sin(thetay), 0, np.cos(thetay)]])
     Rz = np.array([[np.cos(thetaz), -np.sin(thetaz),0],[np.sin(thetaz), np.cos(thetaz),0],[0,0,1]])
@@ -47,10 +64,16 @@ def Rota(namefile, thetax, thetay, thetaz, newfile):
     gerafile(newfile, atomos, rota) 
     return rota
 
-rota = Rota('3bS1.log', np.pi/2, 0, 0, '3bRota90.xyz')
+#rota = Rota('3bRota180.xyz', np.pi, 0, 0, '3bRota360.xyz')
+
+def dif(fileS1, fileRota):
+    atomosS1, vetoresS1 = pega_geom(fileS1)
+    atomosRota, vetoresRota = coords(fileRota) 
+    dif = abs(vetoresS1 - vetoresRota)
+    print(dif)
 
 
-
+#dif('3bS1.log', '3bRota360.xyz')
 
     
         
