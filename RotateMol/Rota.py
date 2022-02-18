@@ -49,7 +49,7 @@ def gerafile(namefile, atomos, vetores):
             f.write(str(atomos[i][0])+"\t"+str(vetores[i,0])+"\t"+str(vetores[i,1])+"\t"+str(vetores[i,2])+"\n")
     return 
     
-def Rota(namefile, thetax, thetay, thetaz, newfile):
+def rota(namefile, thetax, thetay, thetaz, newfile):
     atomos, vetores = coords(namefile) #pega_geom(namefile) #
     Rx = np.array([[1,0,0],[0,np.cos(thetax),-np.sin(thetax)],[0, np.sin(thetax), np.cos(thetax)]])
     Ry = np.array([[np.cos(thetay),0,np.sin(thetay)],[0,1,0],[-np.sin(thetay), 0, np.cos(thetay)]])
@@ -64,16 +64,24 @@ def Rota(namefile, thetax, thetay, thetaz, newfile):
     gerafile(newfile, atomos, rota) 
     return rota
 
-#rota = Rota('3bRota180.xyz', np.pi, 0, 0, '3bRota360.xyz')
+#rota = rota('3bRota180.xyz', np.pi, 0, 0, '3bRota360.xyz')
 
-def dif(fileS1, fileRota):
-    atomosS1, vetoresS1 = pega_geom(fileS1)
-    atomosRota, vetoresRota = coords(fileRota) 
-    dif = abs(vetoresS1 - vetoresRota)
-    print(dif)
+def prox(fileS1, fileRota):
+    _, vetoresS1 = pega_geom(fileS1)
+    _, vetoresRota = coords(fileRota) 
+    prox = np.sum(abs(vetoresS1 - vetoresRota))
+    return prox
+
+def busca(fileS1, fileRota):
+    for theta in range(1,2*np.pi):
+        rota
+
 
 
 #dif('3bS1.log', '3bRota360.xyz')
+
+
+
 
     
         
