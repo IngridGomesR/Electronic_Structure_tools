@@ -1,3 +1,4 @@
+from scipy.spatial.transform import Rotation as R
 import numpy as np
 
 def coords(fileDim):
@@ -48,37 +49,42 @@ def gerafile(namefile, atomos, vetores):
         for i in range(len(atomos)):
             f.write(str(atomos[i][0])+"\t"+str(vetores[i,0])+"\t"+str(vetores[i,1])+"\t"+str(vetores[i,2])+"\n")
     return 
+
+
+def rota(file, trans, thetax, thetay, thetaz, newfile):
+    atomos1, vec1 = coords(file)
+    r = R.from_rotvec([thetax, thetay, thetaz])
+    vecrota = r.apply(vec1)
+    vectrans = vecrota + trans
+    gerafile(newfile, atomos1, vectrans)
     
-def rota(namefile, thetax, thetay, thetaz, newfile):
-    atomos, vetores = coords(namefile) #pega_geom(namefile) #
-    Rx = np.array([[1,0,0],[0,np.cos(thetax),-np.sin(thetax)],[0, np.sin(thetax), np.cos(thetax)]])
-    Ry = np.array([[np.cos(thetay),0,np.sin(thetay)],[0,1,0],[-np.sin(thetay), 0, np.cos(thetay)]])
-    Rz = np.array([[np.cos(thetaz), -np.sin(thetaz),0],[np.sin(thetaz), np.cos(thetaz),0],[0,0,1]])
-    L =[]
-    for vetor in vetores:
-        rotax = np.dot(Rx,vetor)
-        rotay = np.dot(Ry,rotax)
-        rotaz = np.dot(Rz,rotay)
-        L.append(rotaz)
-    rota = np.array(L)
-    gerafile(newfile, atomos, rota) 
-    return rota
+
+rota('Benzeno.xyz', np.array([0,0,4]), 0, 0, np.pi/6, 'test.xyz')
+
+#def rota(namefile, thetax, thetay, thetaz, newfile):
+#    atomos, vetores = coords(namefile) #pega_geom(namefile) #
+#    Rx = np.array([[1,0,0],[0,np.cos(thetax),-np.sin(thetax)],[0, np.sin(thetax), np.cos(thetax)]])
+#    Ry = np.array([[np.cos(thetay),0,np.sin(thetay)],[0,1,0],[-np.sin(thetay), 0, np.cos(thetay)]])
+#    Rz = np.array([[np.cos(thetaz), -np.sin(thetaz),0],[np.sin(thetaz), np.cos(thetaz),0],[0,0,1]])
+#    L =[]
+#    for vetor in vetores:
+#        rotax = np.dot(Rx,vetor)
+#        rotay = np.dot(Ry,rotax)
+#        rotaz = np.dot(Rz,rotay)
+#        L.append(rotaz)
+#    rota = np.array(L)
+#    gerafile(newfile, atomos, rota) 
+#    return rota
 
 #rota = rota('3bRota180.xyz', np.pi, 0, 0, '3bRota360.xyz')
 
-def prox(fileS1, fileRota):
-    _, vetoresS1 = pega_geom(fileS1)
-    _, vetoresRota = coords(fileRota) 
-    prox = np.sum(abs(vetoresS1 - vetoresRota))
-    return prox
-
-def busca(fileS1, fileRota):
-    for theta in range(1,2*np.pi):
-        rota
+#def prox(fileS1, fileRota):
+#    _, vetoresS1 = pega_geom(fileS1)
+#    _, vetoresRota = coords(fileRota) 
+#    prox = np.sum(abs(vetoresS1 - vetoresRota))
+#    return prox
 
 
-
-#dif('3bS1.log', '3bRota360.xyz')
 
 
 
