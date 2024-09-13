@@ -1,9 +1,11 @@
 from scipy.spatial.transform import Rotation as R
 import numpy as np
-from lx import tools
+from lx.parser import pega_geom
+import lx.tools as tools
+import sys
 
 weights = {
-    '1': 1.00797,    '2': 4.00260,    '3': 6.941,    '4': 9.01218,    '5': 10.81,    '6': 12.011,    '7': 14.0067,    '8': 15.9994,
+    '1': 1.00797,     '2': 4.00260,    '3': 6.941,    '4': 9.01218,    '5': 10.81,    '6': 12.011,    '7': 14.0067, '8': 15.9994,
     '9': 18.998403,    '10': 20.179,    '11': 22.98977,    '12': 24.305,    '13': 26.98154,    '14': 28.0855,    '15': 30.97376,
     '16': 32.06,    '17': 35.453,    '19': 39.0983,    '18': 39.948,    '20': 40.08,    '21': 44.9559,    '22': 47.90,    '23': 50.9415,
     '24': 51.996,    '25': 54.9380,    '26': 55.847,    '28': 58.70,    '27': 58.9332,    '29': 63.546,    '30': 65.38,    '31': 69.72,
@@ -17,9 +19,7 @@ weights = {
     '89': 227.0278,    '91': 231.0359,    '90': 232.0381,    '93': 237.0482,    '92': 238.029,    '94': 242,    '95': 243,    '97': 247,
     '96': 247,    '102': 250,    '98': 251,    '99': 252,    '108': 255,    '109': 256,    '100': 257,    '101': 258,    '103': 260,
     '104': 261,    '107': 262,    '105': 262,    '106': 263,    '110': 269,    '111': 272,    '112': 277,
-}
-
-mass = {'H' : 1.008,'HE' : 4.003, 'LI' : 6.941, 'BE' : 9.012,\
+    'H' : 1.008,'HE' : 4.003, 'LI' : 6.941, 'BE' : 9.012,\
                  'B' : 10.811, 'C' : 12.011, 'N' : 14.007, 'O' : 15.999,\
                  'F' : 18.998, 'Ne' : 20.180, 'Na' : 22.990, 'Mg' : 24.305,\
                  'Al' : 26.982, 'Si' : 28.086, 'P' : 30.974, 'S' : 32.066,\
@@ -158,10 +158,10 @@ def translation(atomos1, vetores1, atomos2, vetores2):
     return trans, dcm
 
 def kappa2(file1S1, file2S1, fileDim):
-    vec_opt1, atom_opt1 = tools.pega_geom(file1S1)
-    vec_opt2, atom_opt2 = tools.pega_geom(file2S1)
+    vec_opt1, atom_opt1 = pega_geom(file1S1)
+    vec_opt2, atom_opt2 = pega_geom(file2S1)
 
-    vec_dim, atom_dim  = tools.pega_geom(fileDim) 
+    vec_dim, atom_dim  = pega_geom(fileDim) 
     n_atoms = np.shape(atom_dim)[0] #Pega o numero de atomos total
     atom_dim1 = atom_dim[:int(n_atoms/2)] #Pega a primeira metade
     atom_dim2 = atom_dim[int((n_atoms/2)):] #Pega a segunda metade
@@ -193,9 +193,9 @@ def kappa2(file1S1, file2S1, fileDim):
 
 
 def run_kappa():
-    file1S1 = tools.fetch_file("log",['.log'])#input('log file from mol1: ')
-    file2S1 = tools.fetch_file("log",['.log'])#input('log file from mol2: ')
-    fileDim = tools.fetch_file("dimer",['.log','.xyz'])#input('xyz file from dimer: ')
+    file1S1 = sys.argv[1] #input('log file from mol1: ')
+    file2S1 = sys.argv[2] #input('log file from mol2: ')
+    fileDim = sys.argv[3] #input('xyz file from dimer: ')
     kappa = kappa2(file1S1, file2S1, fileDim)
     print("Orientation Factor (k^2): {0:.2f}".format(kappa))
 
